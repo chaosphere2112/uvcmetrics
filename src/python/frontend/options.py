@@ -70,6 +70,7 @@ class Options():
       self._opts['translate'] = True
       self._opts['translations'] = {}
       self._opts['levels'] = None
+      self._opts['difflevels'] = None #levels for a difference plot
 
       self._opts['output']['compress'] = True
       self._opts['output']['json'] = False
@@ -192,7 +193,7 @@ class Options():
                logging.warning('Unknown option %s', k)
          print 'Added set: ', self._opts[dictkey][i]
 
-   def processLevels(self, levels):
+   def processLevels(self, levels, diff=False):
        def checkTypes(x):
            "allow only ints and floats"
            ok = True
@@ -213,7 +214,11 @@ class Options():
            levels = eval(levels)
            if type(levels) is tuple:
                if checkTypes(levels):
-                   self._opts['levels'] = levels
+                   if diff:
+                       levels.sort()
+                       self._opts['difflevels'] = levels
+                   else:
+                       self._opts['levels'] = levels
                    return
        except:
            pass
@@ -537,6 +542,8 @@ class Options():
       # 2) diags-new.py - takes every option
       # 3) meta-diags.py - takes model/path info, plus some extra options.
       import sys
+      import pdb
+      pdb.set_trace()
       progname = sys.argv[0]
       print progname
       progname = progname.split('/')[-1]
@@ -606,6 +613,7 @@ class Options():
          #levels for isofill plots
 
          runopts.add_argument('--levels', help="Specify a file name containing a list of levels or the comma delimited levels directly")
+         runopts.add_argument('--difflevels', help="These levels are for a difference plot. Specification is the same as levels.")
          runopts.add_argument('--translate', nargs='?', default='y',
             help="Enable translation for obs sets to datasets. Optional provide a colon separated input to output list e.g. DSVAR1:OBSVAR1")
       if 'metadiags' not in progname and 'metadiags.py' not in progname:
@@ -681,6 +689,7 @@ class Options():
 
 
       ### Do the work
+      ######### this is where the command gets parsed and args gets attributes. #######
       args = parser.parse_args()
       if(args.version == 1):
          import metrics.common.utilities
@@ -745,6 +754,9 @@ class Options():
       if (args.levels) != None:
           self.processLevels(args.levels)
 
+      if (args.difflevels) != None:
+          self.processLevels(args.difflevels, diff=True)
+          
       # I checked; these are global and it doesn't seem to matter if you import cdms2 multiple times;
       # they are still set after you set them once in the python process.
       if(args.compress != None):
