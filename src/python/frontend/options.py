@@ -71,6 +71,7 @@ class Options():
       self._opts['translations'] = {}
       self._opts['levels'] = None
       self._opts['difflevels'] = None #levels for a difference plot
+      self._opts['taskspernode'] = None
 
       self._opts['output']['compress'] = True
       self._opts['output']['json'] = False
@@ -421,8 +422,6 @@ class Options():
 #######
 ####### This should be modified to look in the master dictionary files...
 #######
-#         dm = metrics.packages.diagnostic_groups.diagnostics_menu()
-#
 #         pclass = dm[package.upper()]()
 #
 #         avail_sets = []
